@@ -1,25 +1,35 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { FaEnvelope, FaLock } from "react-icons/fa";
 import API from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 
 function Login() {
 
     const [email, setEmail] = useState("");
+
     const [password, setPassword] = useState("");
 
+    const [loading, setLoading] = useState(false);
+
     const navigate = useNavigate();
+
     const { login } = useAuth();
 
     const handleSubmit = async (e) => {
 
         e.preventDefault();
 
+        setLoading(true);
+
         try {
 
             const res = await API.post("/auth/login", {
+
                 email,
+
                 password,
+
             });
 
             login(res.data.token);
@@ -28,59 +38,126 @@ function Login() {
 
         } catch (error) {
 
-            alert(
-                error.response?.data?.message || "Login Failed"
-            );
+            alert(error.response?.data?.message || "Login Failed");
 
         }
+
+        setLoading(false);
 
     };
 
     return (
 
-        <div>
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-cyan-100 p-6">
 
-            <h1>Login</h1>
+            <div className="w-full max-w-md bg-white/80 backdrop-blur-xl shadow-2xl rounded-3xl p-10">
 
-            <form onSubmit={handleSubmit}>
+                <div className="text-center mb-10">
 
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) =>
-                        setEmail(e.target.value)
-                    }
-                />
+                    <h1 className="text-5xl font-bold text-indigo-600">
 
-                <br /><br />
+                        CashIQ
 
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) =>
-                        setPassword(e.target.value)
-                    }
-                />
+                    </h1>
 
-                <br /><br />
+                    <p className="text-slate-500 mt-3">
 
-                <button type="submit">
+                        Smart Finance. Smarter You.
 
-                    Login
+                    </p>
 
-                </button>
+                </div>
 
-            </form>
+                <h2 className="text-2xl font-semibold text-slate-800 mb-2">
 
-            <br />
+                    Welcome Back 👋
 
-            <Link to="/register">
+                </h2>
 
-                Don't have an account?
+                <p className="text-slate-500 mb-8">
 
-            </Link>
+                    Sign in to continue
+
+                </p>
+
+                <form
+                    onSubmit={handleSubmit}
+                    className="space-y-5"
+                >
+
+                    <div className="relative">
+
+                        <FaEnvelope className="absolute left-4 top-4 text-slate-400" />
+
+                        <input
+                            type="email"
+                            placeholder="Email Address"
+                            value={email}
+                            onChange={(e)=>setEmail(e.target.value)}
+                            className="w-full pl-12 pr-4 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                        />
+
+                    </div>
+
+                    <div className="relative">
+
+                        <FaLock className="absolute left-4 top-4 text-slate-400" />
+
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e)=>setPassword(e.target.value)}
+                            className="w-full pl-12 pr-4 py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                        />
+
+                    </div>
+
+                    <button
+
+                        type="submit"
+
+                        disabled={loading}
+
+                        className="w-full bg-indigo-600 hover:bg-indigo-700 transition-all duration-300 text-white py-4 rounded-xl font-semibold shadow-lg"
+
+                    >
+
+                        {
+
+                            loading ?
+
+                            "Signing In..."
+
+                            :
+
+                            "Login"
+
+                        }
+
+                    </button>
+
+                </form>
+
+                <p className="text-center mt-8 text-slate-500">
+
+                    Don't have an account?
+
+                    <Link
+
+                        to="/register"
+
+                        className="ml-2 text-indigo-600 font-semibold"
+
+                    >
+
+                        Register
+
+                    </Link>
+
+                </p>
+
+            </div>
 
         </div>
 
