@@ -12,27 +12,31 @@ function SummaryCard({
 
     return (
 
-        <div className="bg-white rounded-3xl shadow-lg p-6 hover:-translate-y-1 transition-all duration-300">
+        <div className="bg-white rounded-3xl shadow-lg p-7 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300">
 
-            <div
-                className={`w-14 h-14 rounded-2xl ${color} text-white flex items-center justify-center text-2xl`}
-            >
+            <div className={`w-16 h-16 ${color} rounded-2xl flex items-center justify-center text-white text-3xl shadow-lg`}>
 
                 {icon}
 
             </div>
 
-            <h2 className="text-slate-500 mt-5">
+            <h2 className="mt-6 text-slate-500 font-medium">
 
                 {title}
 
             </h2>
 
-            <h1 className="text-3xl font-bold text-slate-800 mt-2">
+            <h1 className="text-4xl font-bold text-slate-800 mt-2">
 
                 {value}
 
             </h1>
+
+            <p className="text-emerald-500 mt-3 text-sm">
+
+                ↑ Updated just now
+
+            </p>
 
         </div>
 

@@ -1,136 +1,183 @@
-import Navbar from "../components/Navbar";
-import SummaryCard from "../components/SummaryCard";
 import { useEffect, useState } from "react";
 import API from "../api/axios";
 
+import Navbar from "../components/Navbar";
+import SummaryCard from "../components/SummaryCard";
+import ExpenseForm from "../components/ExpenseForm";
+import ExpenseList from "../components/ExpenseList";
+import ExpenseBarChart from "../components/ExpenseBarChart";
+import ExpensePieChart from "../components/ExpensePieChart";
+
 import {
-
     FaWallet,
-
     FaMoneyBill,
-
-    FaChartPie
-
+    FaChartPie,
 } from "react-icons/fa";
 
 function Dashboard() {
 
     const [dashboardData, setDashboardData] = useState(null);
+    const [expenses, setExpenses] = useState([]);
+    const [selectedExpense, setSelectedExpense] = useState(null);
 
-const hour = new Date().getHours();
+    const hour = new Date().getHours();
 
-let greeting = "Good Evening 🌙";
+    let greeting = "Good Evening 🌙";
 
-if (hour < 12) {
-
-    greeting = "Good Morning ☀️";
-
-}
-
-else if (hour < 17) {
-
-    greeting = "Good Afternoon 🌤️";
-
-}
-
-useEffect(() => {
-
-    fetchDashboard();
-
-}, []);
-
-const fetchDashboard = async () => {
-
-    try {
-
-        const token = sessionStorage.getItem("token");
-
-        const res = await API.get("/dashboard", {
-
-            headers: {
-
-                Authorization: `Bearer ${token}`
-
-            }
-
-        });
-
-        setDashboardData(res.data);
-
+    if (hour < 12) {
+        greeting = "Good Morning ☀️";
+    } else if (hour < 17) {
+        greeting = "Good Afternoon 🌤️";
     }
 
-    catch (error) {
+    const fetchDashboard = async () => {
 
-        console.log(error);
+        try {
 
-    }
+            const res = await API.get("/dashboard");
+
+            setDashboardData(res.data);
+
+        } catch (error) {
+
+            console.log(error);
+
+        }
+
+    };
+
+    const fetchExpenses = async () => {
+
+        try {
+
+            const res = await API.get("/expenses");
+
+            setExpenses(res.data);
+
+        } catch (error) {
+
+            console.log(error);
+
+        }
+
+    };
+
+    const deleteExpense = async (id) => {
+
+        try {
+
+            await API.delete(`/expenses/${id}`);
+
+            fetchDashboard();
+            fetchExpenses();
+
+        } catch (error) {
+
+            console.log(error);
+
+        }
+
+    };
+    const editExpense = (expense) => {
+
+    setSelectedExpense(expense);
 
 };
 
-    return (
+    useEffect(() => {
 
-        <div className="min-h-screen bg-slate-100 p-8">
+        fetchDashboard();
+        fetchExpenses();
 
-            <Navbar />
+    }, []);
 
-            <div className="mt-8">
+return (
 
-                <h1 className="text-4xl font-bold text-slate-800">
+    <div className="min-h-screen bg-slate-100 p-8">
 
-                    {greeting}, Khushi 👋
+        <Navbar />
 
-                </h1>
+        <div className="mt-10">
 
-                <p className="text-slate-500 mt-2">
+            <h1 className="text-5xl font-bold text-slate-800">
 
-                    Here's your financial overview.
+                {greeting} 👋
 
-                </p>
+            </h1>
 
-            </div>
+            <p className="text-slate-500 text-lg mt-3">
 
-            <div className="grid md:grid-cols-3 gap-6 mt-10">
+                Welcome back! Here's your financial overview.
 
-                <SummaryCard
-
-                    title="Total Expenses"
-
-                    value={`₹${dashboardData?.totalExpenses || 0}`}
-
-                    icon={<FaWallet />}
-
-                    color="bg-indigo-600"
-
-                />
-
-                <SummaryCard
-
-                    title="Transactions"
-
-                    value={dashboardData?.totalTransactions || 0}
-
-                    icon={<FaMoneyBill />}
-
-                    color="bg-emerald-500"
-
-                />
-
-                <SummaryCard
-
-                    title="Top Category"
-
-                    value={dashboardData?.categorySummary?.[0]?._id || "None"}
-                    icon={<FaChartPie />}
-
-                    color="bg-orange-500"
-
-                />
-
-            </div>
+            </p>
 
         </div>
 
-    );
+        {/* Summary Cards */}
+
+        <div className="grid md:grid-cols-3 gap-6 mt-10">
+
+            <SummaryCard
+                title="Total Expenses"
+                value={`₹${dashboardData?.totalExpenses || 0}`}
+                icon={<FaWallet />}
+                color="bg-indigo-600"
+            />
+
+            <SummaryCard
+                title="Transactions"
+                value={dashboardData?.totalTransactions || 0}
+                icon={<FaMoneyBill />}
+                color="bg-emerald-500"
+            />
+
+            <SummaryCard
+                title="Top Category"
+                value={dashboardData?.categorySummary?.[0]?.category || "None"}
+                icon={<FaChartPie />}
+                color="bg-orange-500"
+            />
+
+        </div>
+
+        {/* Analytics */}
+
+        <div className="grid lg:grid-cols-2 gap-8 mt-10">
+
+            <ExpenseBarChart
+                data={dashboardData?.monthlySummary || []}
+            />
+
+            <ExpensePieChart
+                data={dashboardData?.categorySummary || []}
+            />
+
+        </div>
+
+        {/* Expense Form */}
+
+        <div className="mt-10">
+
+            <ExpenseForm
+                fetchDashboard={fetchDashboard}
+                fetchExpenses={fetchExpenses}
+                selectedExpense={selectedExpense}
+                setSelectedExpense={setSelectedExpense}
+            />
+
+        </div>
+
+        {/* Expense List */}
+
+        <ExpenseList
+            expenses={expenses}
+            onDelete={deleteExpense}
+            onEdit={editExpense}
+        />
+
+    </div>
+
+);
 
 }
 

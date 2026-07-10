@@ -35,13 +35,61 @@ export const getDashboard = async (req, res) => {
                 }
             }
         ]);
+        const formattedCategorySummary = categorySummary.map((item) => ({
+    category: item._id,
+    total: item.total,
+}));
+        const monthlySummary = await Expense.aggregate([
+    {
+        $match: {
+            user: userId
+        }
+    },
+    {
+        $group: {
+            _id: {
+                year: { $year: "$date" },
+                month: { $month: "$date" }
+            },
+            total: {
+                $sum: "$amount"
+            }
+        }
+    },
+    {
+        $sort: {
+            "_id.year": 1,
+            "_id.month": 1
+        }
+    }
+]);
+const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+];
 
-        return res.status(200).json({
-            totalExpenses,
-            totalTransactions,
-            recentTransactions,
-            categorySummary
-        });
+const formattedMonthlySummary = monthlySummary.map((item) => ({
+    month: monthNames[item._id.month - 1],
+    total: item.total,
+}));
+
+    return res.status(200).json({
+    totalExpenses,
+    totalTransactions,
+    recentTransactions,
+    categorySummary: formattedCategorySummary,
+    monthlySummary: formattedMonthlySummary,
+});
 
     } catch (error) {
 

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import API from "../api/axios";
 import { useAuth } from "../context/AuthContext";
+import toast from "react-hot-toast";
 
 function Login() {
 
@@ -33,12 +34,13 @@ function Login() {
             });
 
             login(res.data.token);
-
+            toast.success("Welcome Back!");
             navigate("/dashboard");
+            
 
         } catch (error) {
 
-            alert(error.response?.data?.message || "Login Failed");
+            toast.error(error.response?.data?.message || "Login Failed");
 
         }
 
@@ -91,6 +93,7 @@ function Login() {
 
                         <input
                             type="email"
+                            required
                             placeholder="Email Address"
                             value={email}
                             onChange={(e)=>setEmail(e.target.value)}
@@ -105,6 +108,7 @@ function Login() {
 
                         <input
                             type="password"
+                            required
                             placeholder="Password"
                             value={password}
                             onChange={(e)=>setPassword(e.target.value)}
@@ -119,7 +123,11 @@ function Login() {
 
                         disabled={loading}
 
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 transition-all duration-300 text-white py-4 rounded-xl font-semibold shadow-lg"
+                        className={`w-full py-4 rounded-xl font-semibold shadow-lg transition-all duration-300 text-white ${
+    loading
+        ? "bg-indigo-400 cursor-not-allowed"
+        : "bg-indigo-600 hover:bg-indigo-700"
+}`}
 
                     >
 
